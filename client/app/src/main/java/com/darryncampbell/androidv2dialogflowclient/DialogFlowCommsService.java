@@ -19,7 +19,8 @@ import java.net.URLEncoder;
 
 public class DialogFlowCommsService extends IntentService {
 
-    private final String FIREBASE_SERVER = "https://us-central1-androidv2dialogflow-xspkei.cloudfunctions.net";
+    private final String PROJECT_ID = "androidv2dialogflow-xspkei";
+    private final String FIREBASE_SERVER = "https://us-central1-" + PROJECT_ID + ".cloudfunctions.net";
 
     private static final String ACTION_DETECT_INTENT = "com.darryncampbell.androidv2dialogflowclient.action.DETECT_INTENT";
     private static final String EXTRA_QUESTION = "com.darryncampbell.androidv2dialogflowclient.extra.QUESTION";

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "812223144017",
+    "firebase_url": "https://androidv2dialogflow-xspkei.firebaseio.com",
+    "project_id": "androidv2dialogflow-xspkei",
+    "storage_bucket": "androidv2dialogflow-xspkei.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812223144017:android:1834be5fce983d48ac1870",
+        "android_client_info": {
+          "package_name": "com.darryncampbell.androidv2dialogflowclient"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "812223144017-374a1blf2ovhivfjk519an9sgpuga96f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2CX6jZm3IBnBPwJHj3Au5nB1zoEN-0YU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "812223144017-374a1blf2ovhivfjk519an9sgpuga96f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

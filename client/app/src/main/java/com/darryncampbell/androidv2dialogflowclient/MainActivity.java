@@ -8,9 +8,16 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.FirebaseFunctionsException;
+import com.google.firebase.functions.HttpsCallableResult;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -29,12 +36,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     public static String TAG = "DialogFlowV2";
     public static String DIALOGFLOW_RESPONSE = "DialogFlowResponse";
+    private FirebaseFunctions mFunctions;
     private TextToSpeech textToSpeech;
     private SpeechRecognizer speechRecognizer;
     private boolean ttsOk = false;
@@ -46,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mFunctions = FirebaseFunctions.getInstance();
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -129,14 +140,31 @@ public class MainActivity extends AppCompatActivity {
 
     public void micButtonClicked()
     {
-        //  todo Call Android speech recognition class to gather text
-        //  todo ask for record audio permission
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
-
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS,5);
         speechRecognizer.startListening(intent);
+
+//        SendMessageToFirebaseFunctions("detectIntent", "How are you today?")
+//                .addOnCompleteListener(new OnCompleteListener<String>() {
+//            @Override
+//            public void onComplete(@NonNull Task<String> task) {
+//                if (!task.isSuccessful()) {
+//                    Exception e = task.getException();
+//                    if (e instanceof FirebaseFunctionsException) {
+//                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+//                        FirebaseFunctionsException.Code code = ffe.getCode();
+//                        Object details = ffe.getDetails();
+//                    }
+//                }
+//
+//                String result = task.getResult();
+//                Log.i(TAG, "Received Response: " + result);
+//                MessageReceived(result);
+//            }
+//        });
+
 //        String question = "How are you feeling?";
 //        DialogFlowCommsService.startActionDetectIntent(this, question);
     }
@@ -182,10 +210,30 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "result " + data.get(i));
                 str += data.get(i);
             }
-            if (data.size() >= 1)
+            if (str.length() >= 1)
             {
-                SetOutputDisplay("Speech Recognition Result: " + data.get(0));
-                DialogFlowCommsService.startActionDetectIntent(getApplicationContext(), data.get(0).toString());
+                SetOutputDisplay("Speech Recognition Result: " + str);
+                //DialogFlowCommsService.startActionDetectIntent(getApplicationContext(), data.get(0).toString());
+
+                SendMessageToFirebaseFunctions("detectIntent", str)
+                        .addOnCompleteListener(new OnCompleteListener<String>() {
+                            @Override
+                            public void onComplete(@NonNull Task<String> task) {
+                                if (!task.isSuccessful()) {
+                                    Exception e = task.getException();
+                                    if (e instanceof FirebaseFunctionsException) {
+                                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+                                        FirebaseFunctionsException.Code code = ffe.getCode();
+                                        Object details = ffe.getDetails();
+                                    }
+                                }
+
+                                String result = task.getResult();
+                                Log.i(TAG, "Received Response: " + result);
+                                MessageReceived(result);
+                            }
+                        });
+
             }
             else
                 SetOutputDisplay("Speech Recognition could not detect question");
@@ -200,23 +248,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private Task<String> SendMessageToFirebaseFunctions(String functionName, String question)
+    {
+        // Create the arguments to the callable function.
+        Map<String, Object> data = new HashMap<>();
+        data.put("question", question);
+        data.put("push", true);
+
+        return mFunctions
+                .getHttpsCallable(functionName)
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                    @Override
+                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        // This continuation runs on either success or failure, but if the task
+                        // has failed then getResult() will throw an Exception which will be
+                        // propagated down.
+                        String result = (String) task.getResult().getData();
+                        return result;
+                    }
+                });
+    }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String response = intent.getStringExtra("response");
-            Log.d(TAG, "Got message: " + response);
-            SetOutputDisplay("Response: " + response);
-            if (ttsOk)
-            {
-                int speechStatus = textToSpeech.speak(response, TextToSpeech.QUEUE_FLUSH, null, "1");
-                if (speechStatus == TextToSpeech.ERROR) {
-                    Log.e(TAG, "Error in converting Text to Speech");
-                }
-            }
+            MessageReceived(response);
         }
     };
+
+    private void MessageReceived(String response)
+    {
+        Log.d(TAG, "Got message: " + response);
+        SetOutputDisplay("Response: " + response);
+        if (ttsOk)
+        {
+            int speechStatus = textToSpeech.speak(response, TextToSpeech.QUEUE_FLUSH, null, "1");
+            if (speechStatus == TextToSpeech.ERROR) {
+                Log.e(TAG, "Error in converting Text to Speech");
+            }
+        }
+    }
 
     private void SetOutputDisplay(String outputMessage)
     {
