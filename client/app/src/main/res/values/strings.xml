@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Android V2 DialogFlow Client</string>
+    <string name="action_settings">Settings</string>
+</resources>
