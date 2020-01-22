@@ -1,19 +1,19 @@
 *This application is provided without guarantee or warranty*
 =========================================================
 
-# AndroidV2DialogFlow
+# AndroidV2Dialogflow
 
-With the deprecation of the [Android DialogFlow SDK](https://github.com/dialogflow/dialogflow-android-client) and the move from DialogFlow V1 to DialogFlow V2 [being forced in March 2020](https://dialogflow.com/docs/reference/v1-v2-migration-guide) there is no native option to incorporate DialogFlow into your Android application.  There are [several API clients](https://cloud.google.com/dialogflow/docs/reference/libraries/overview) available for DialogFlow V2 but note that the Java client does not support Android.
+With the deprecation of the [Android Dialogflow SDK](https://github.com/dialogflow/dialogflow-android-client) and the move from Dialogflow V1 to Dialogflow V2 [being forced in March 2020](https://dialogflow.com/docs/reference/v1-v2-migration-guide) there is no native option to incorporate Dialogflow into your Android application.  There are [several API clients](https://cloud.google.com/dialogflow/docs/reference/libraries/overview) available for Dialogflow V2 but note that the Java client does not support Android.
 
-To call DialogFlow V2 Agents from Android it is therefore necessary to either use the REST API or an intermediary system that **does** have a DF client and can manage the DF communications.  Authenticating the REST API on Android does not seem to be supported so this project demonstrates how to use Firebase Functions to communicate with DialogFlow via the [DF NodeJS API](https://cloud.google.com/dialogflow/docs/reference/libraries/nodejs).
+To call Dialogflow V2 Agents from Android it is therefore necessary to either use the REST API or an intermediary system that **does** have a DF client and can manage the DF communications.  Authenticating the REST API on Android does not seem to be supported so this project demonstrates how to use Firebase Functions to communicate with Dialogflow via the [DF NodeJS API](https://cloud.google.com/dialogflow/docs/reference/libraries/nodejs).
 
 ![Architecture](https://raw.githubusercontent.com/darryncampbell/AndroidV2DialogFlow/master/media/diagram.png)
 
-You could use any number of intermediary server or serverless component but since Firebase lives within GCP, as does DialogFlow, all the authentication seems to happen automatically.
+You could use any number of intermediary server or serverless component but since Firebase lives within GCP, as does Dialogflow, all the authentication seems to happen automatically.
 
-There is a reference project implementation for this code which has usage limits as defined by the free tier for Firebase, GCP and DialogFlow:
+There is a reference project implementation for this code which has usage limits as defined by the free tier for Firebase, GCP and Dialogflow:
 + **Reference project ID:** androidv2dialogflow-xspkei
-+ **Reference project DialogFlow Agent:** _Only Supports a single question, 'How are you?'._
++ **Reference project Dialogflow Agent:** _Only Supports a single question, 'How are you?'._
 
 You can compile the sample Android project and run it against this reference backend.
 
@@ -46,9 +46,9 @@ These prerequisites are only required to modify the existing project
 - Install the [Firebase CLI](https://developers.google.com/assistant/actions/dialogflow/deploy-fulfillment)
 
 
-## DialogFlow
+## Dialogflow
 
-+ Follow the [DialogFlow setup instructions](https://cloud.google.com/dialogflow/docs/quick/setup) to create a project.  
++ Follow the [Dialogflow setup instructions](https://cloud.google.com/dialogflow/docs/quick/setup) to create a project.  
 + Create an Intent to handle the conversation your GDF instance supports.  The reference implementation has only a single Intent
 + If you want to test GDF from a Windows or Linux box you will need to set up authentication but once I deployed to Firebase, and everything was part of the same GCP project essentially, I did not need to configure separate authentication.
 
@@ -77,7 +77,6 @@ Below: Speech recognition has succeeded.
 
 ![Android Client](https://raw.githubusercontent.com/darryncampbell/AndroidV2DialogFlow/master/media/client_2.jpg)
 
-Below: Response has been received from Google DialogFlow
+Below: Response has been received from Google Dialogflow
 
 ![Android Client](https://raw.githubusercontent.com/darryncampbell/AndroidV2DialogFlow/master/media/client_3.jpg)
-
