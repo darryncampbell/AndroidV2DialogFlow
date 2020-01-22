@@ -33,6 +33,10 @@ Postman output is shown below:
 
 ![Testing](https://raw.githubusercontent.com/darryncampbell/AndroidV2DialogFlow/master/media/testing.png)
 
+You can also run the Android client in this project and ask the same question via speech-to-text:
+
+![Android Client](https://raw.githubusercontent.com/darryncampbell/AndroidV2DialogFlow/master/media/client_3.jpg)
+
 # Running the code in your own project
 
 ## Prerequisites
