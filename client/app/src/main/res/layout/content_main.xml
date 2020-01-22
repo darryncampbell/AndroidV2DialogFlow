@@ -10,9 +10,11 @@
 
     <TextView
         android:id="@+id/txtOutput"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Info text will go here"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:text="Info text will go here\n\nInstructions:\n- Tap the mic icon (device will start listening)\n- Ask 'How are you feeling?'\n- Device will communicate with DialogFlow\n- Device should respond with 'I'm feeling good thank you'"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

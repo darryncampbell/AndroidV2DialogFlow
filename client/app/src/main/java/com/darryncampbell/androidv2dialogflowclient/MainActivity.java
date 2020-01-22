@@ -12,7 +12,6 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.FirebaseFunctionsException;
 import com.google.firebase.functions.HttpsCallableResult;
@@ -103,28 +102,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         // If request is cancelled, the result arrays are empty.
@@ -142,31 +119,8 @@ public class MainActivity extends AppCompatActivity {
     {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
-        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS,5);
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS,1);
         speechRecognizer.startListening(intent);
-
-//        SendMessageToFirebaseFunctions("detectIntent", "How are you today?")
-//                .addOnCompleteListener(new OnCompleteListener<String>() {
-//            @Override
-//            public void onComplete(@NonNull Task<String> task) {
-//                if (!task.isSuccessful()) {
-//                    Exception e = task.getException();
-//                    if (e instanceof FirebaseFunctionsException) {
-//                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
-//                        FirebaseFunctionsException.Code code = ffe.getCode();
-//                        Object details = ffe.getDetails();
-//                    }
-//                }
-//
-//                String result = task.getResult();
-//                Log.i(TAG, "Received Response: " + result);
-//                MessageReceived(result);
-//            }
-//        });
-
-//        String question = "How are you feeling?";
-//        DialogFlowCommsService.startActionDetectIntent(this, question);
     }
 
     private void createSpeechRecognizer() {
@@ -202,18 +156,17 @@ public class MainActivity extends AppCompatActivity {
         }
         public void onResults(Bundle results)
         {
-            String str = new String();
+            //  Speech has been recognized, send it to Firebase functions and therefore to DialogFlow
             Log.d(TAG, "onResults " + results);
             ArrayList data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             for (int i = 0; i < data.size(); i++)
             {
                 Log.d(TAG, "result " + data.get(i));
-                str += data.get(i);
             }
-            if (str.length() >= 1)
+            if (data.size() >= 1)
             {
+                String str = data.get(0).toString();
                 SetOutputDisplay("Speech Recognition Result: " + str);
-                //DialogFlowCommsService.startActionDetectIntent(getApplicationContext(), data.get(0).toString());
 
                 SendMessageToFirebaseFunctions("detectIntent", str)
                         .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -227,13 +180,11 @@ public class MainActivity extends AppCompatActivity {
                                         Object details = ffe.getDetails();
                                     }
                                 }
-
                                 String result = task.getResult();
                                 Log.i(TAG, "Received Response: " + result);
                                 MessageReceived(result);
                             }
                         });
-
             }
             else
                 SetOutputDisplay("Speech Recognition could not detect question");
